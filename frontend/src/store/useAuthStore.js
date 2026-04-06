@@ -1,13 +1,17 @@
 import { create } from 'zustand';
 import { axiosInstance } from '../lib/axios.js';
 import { toast } from 'react-hot-toast';
+import { io } from 'socket.io-client';
 
-export const useAuthStore = create((set) => ({
+const BASE_URL = "http://localhost:5001";
+
+export const useAuthStore = create((set, get) => ({
     authUser: null,
     isSigningUp: false,
     isLoggingIn: false,
     isUpdatingProfile: false,
     onlineUsers: [],
+    socket: null,
 
     isCheckingAuth: true,
 
@@ -15,6 +19,7 @@ export const useAuthStore = create((set) => ({
         try {
             const res = await axiosInstance.get('/auth/check');
             set({ authUser: res.data });
+            get().connectSocket();
         } catch (error) {
             console.error('Error checking auth:', error);
             set({ authUser: null });
@@ -73,6 +78,20 @@ export const useAuthStore = create((set) => ({
             toast.error(`Upload failed: ${error.response.data.message}`);
         } finally {
             set({ isUpdatingProfile: false });
+        }
+    },
+
+    connectSocket: () => {
+        const { authUser } = get();
+        if (!authUser || get().socket?.connected) return;
+        const socket = io(BASE_URL);
+        socket.connect();
+        set({ socket:socket });
+    },
+
+    disconnectSocket: () => {
+        if(get().socket?.connected) {
+            get().socket.disconnect();
         }
     },
 }));
