@@ -2,6 +2,8 @@
 
 Chachat is a real-time chat application that allows users to communicate instantly with each other with customizable themes. It features user authentication, message history, and real-time messaging powered by WebSockets.
 
+![Chachat Example](https://github.com/javierjg3232/chachat/blob/main/chachat-example.png)
+
 ## Technologies Used
 
 ### Backend
